@@ -5,15 +5,25 @@ import "./interfaces/IOracle.sol";
 
 contract OpenAiChatGptVision {
     struct ChatRun {
-        address owner;
+        address caller;
         IOracle.Message[] messages;
         uint256 messagesCount;
+    }
+
+    struct Response {
+        address caller;
+        bool success;
+        string response;
     }
 
     mapping(uint256 => ChatRun) public chatRuns;
     uint256 private chatRunsCount;
 
-    event ChatCreated(address indexed owner, uint256 indexed chatId);
+    event ChatCreated(address indexed caller, uint256 indexed chatId);
+
+    mapping(uint256 => Response) public responses;
+
+    event ResponseReceived(address caller, uint256 indexed chatId, bool indexed success, string response);
 
     address private owner;
     address public oracleAddress;
@@ -59,17 +69,34 @@ contract OpenAiChatGptVision {
         emit OracleAddressUpdated(newOracleAddress);
     }
 
-    function startChat(string memory message, string[] memory imageUrls) public returns (uint256 i) {
+    function copyContentArray(IOracle.Content[] memory source) internal pure returns (IOracle.Content[] memory) {
+        IOracle.Content[] memory result = new IOracle.Content[](source.length);
+
+        for (uint256 i = 0; i < source.length; i++) {
+            result[i] = source[i];
+        }
+        return result;
+    }
+
+    function startChat(address caller, string memory message, string[] memory imageUrls) public returns (uint256 i) {
         ChatRun storage run = chatRuns[chatRunsCount];
 
-        run.owner = msg.sender;
+        run.caller = caller;
         IOracle.Message memory newMessage =
             IOracle.Message({role: "user", content: new IOracle.Content[](imageUrls.length + 1)});
         newMessage.content[0] = IOracle.Content({contentType: "text", value: message});
         for (uint256 u = 0; u < imageUrls.length; u++) {
             newMessage.content[u + 1] = IOracle.Content({contentType: "image_url", value: imageUrls[u]});
         }
-        run.messages.push(newMessage);
+
+        // Manually copy the message content to storage
+        run.messages.push();
+        run.messages[run.messages.length - 1].role = newMessage.role;
+        run.messages[run.messages.length - 1].content = new IOracle.Content[](newMessage.content.length);
+        for (uint256 j = 0; j < newMessage.content.length; j++) {
+            run.messages[run.messages.length - 1].content[j] = newMessage.content[j];
+        }
+
         run.messagesCount = 1;
 
         uint256 currentId = chatRunsCount;
@@ -92,37 +119,16 @@ contract OpenAiChatGptVision {
             "No message to respond to"
         );
 
+        address caller = chatRuns[runId].caller;
         if (!compareStrings(errorMessage, "")) {
-            IOracle.Message memory newMessage = IOracle.Message({role: "assistant", content: new IOracle.Content[](1)});
-            newMessage.content[0].contentType = "text";
-            newMessage.content[0].value = errorMessage;
-            run.messages.push(newMessage);
-            run.messagesCount++;
+            responses[runId] = Response({caller: caller, success: false, response: errorMessage});
+
+            emit ResponseReceived(caller, runId, false, errorMessage);
         } else {
-            IOracle.Message memory newMessage = IOracle.Message({role: "assistant", content: new IOracle.Content[](1)});
-            newMessage.content[0].contentType = "text";
-            newMessage.content[0].value = response.content;
-            run.messages.push(newMessage);
-            run.messagesCount++;
+            responses[runId] = Response({caller: caller, success: true, response: response.content});
+
+            emit ResponseReceived(caller, runId, true, response.content);
         }
-    }
-
-    function addMessage(string memory message, uint256 runId) public {
-        ChatRun storage run = chatRuns[runId];
-        require(
-            keccak256(abi.encodePacked(run.messages[run.messagesCount - 1].role))
-                == keccak256(abi.encodePacked("assistant")),
-            "No response to previous message"
-        );
-        require(run.owner == msg.sender, "Only chat owner can add messages");
-
-        IOracle.Message memory newMessage = IOracle.Message({role: "user", content: new IOracle.Content[](1)});
-        newMessage.content[0].contentType = "text";
-        newMessage.content[0].value = message;
-        run.messages.push(newMessage);
-        run.messagesCount++;
-
-        IOracle(oracleAddress).createOpenAiLlmCall(runId, config);
     }
 
     function getMessageHistory(uint256 chatId) public view returns (IOracle.Message[] memory) {
