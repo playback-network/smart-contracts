@@ -3,17 +3,22 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "forge-std/StdJson.sol";
+import "../lib/forge-std/src/console2.sol";
 import "../src/OpenAiChatGptVision.sol";
-import "../../../lib/forge-std/src/console2.sol";
+
+import "../src/interfaces/IChatGpt.sol";
+import "../src/interfaces/IOracle.sol";
+import "./mocks/ChatOracleMock.sol";
 
 contract OpenAiChatGptVisionTest is Test {
     using stdJson for string;
 
-    OpenAiChatGptVision public openAiChatGptVision;
     address public deployer;
     address public testUser;
     address public manager;
-    address payable public oracle;
+    address public offchainOracle;
+    OpenAiChatGptVision public openAiChatGptVision;
+    ChatOracleMock public oracleMock;
 
     // Used to create addresses
     uint256 _addressSeed = 123456789;
@@ -41,40 +46,42 @@ contract OpenAiChatGptVisionTest is Test {
         vm.deal(deployer, 1000 ether);
 
         manager = makeAddress("Manager");
-        vm.deal(deployer, 1000 ether);
+        vm.deal(manager, 1000 ether);
 
-        // Get Aura contract address
-        auraContractAddress = vm.envAddress("AURA_CONTRACTv2_15v1_1500v2");
-        console2.log("auraContractAddress:", auraContractAddress);
-
-        // vm.startPrank(auraOwner);
-        // console2.log("Transferring ownership of aura contract...");
-        // auraContract.transferOwnership(auraAdmin);
-        // vm.stopPrank();
+        offchainOracle = makeAddress("offchainOracle");
+        vm.deal(offchainOracle, 1000 ether);
 
         vm.startPrank(deployer, deployer);
 
-        openAiChatGptVision = new OpenAiChatGptVision(
-            "https://leela.mypinata.cloud/ipfs/QmQY5wF3AmBTkPbeVCH7Q5Bm5HZActeKRxHCppmr3dskvC/",
-            ROYALTY_BASIS_POINTS,
-            auraContractAddress,
-            manager
-        );
-        openAiChatGptVision.setIsOpen(true);
+        // Deploy mock oracle
+        oracleMock = new ChatOracleMock();
+
+        // Deploy Vision
+        openAiChatGptVision = new OpenAiChatGptVision(address(oracleMock), manager);
+
+        // NOTE: Update oracle whitelist so off-chain oracle can call
+        oracleMock.updateWhitelist(address(offchainOracle), true);
+
+        // NOTE: Update oracle whitelist, setting it to vision contract
+        oracleMock.updateWhitelist(address(openAiChatGptVision), true);
         vm.stopPrank();
+    }
 
-        // Set Aura contract using sepolia address
-        auraContract = IAura.AuraInterface(auraContractAddress);
-        // Get aura contrct owner
-        address owner = auraContract.owner();
-        // log owner
-        console2.log("owner", owner);
+    function test_callOracleContract() external {
+        vm.startPrank(manager, manager);
+        string[] memory images = new string[](3);
+        images[0] = "i1";
+        images[1] = "i2";
+        images[2] = "i3";
+        openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
 
-        // Get auraAdmin of Aura contract
-        // address auraOwner = auraContract.owner();
-
-        vm.startPrank(manager);
-        auraContract.setApprovalForAll(address(openAiChatGptVision), true);
         vm.stopPrank();
+        // Get success response from oracleMock
+        IOracle.OpenAiResponse memory response = oracleMock.getSuccessResponse();
+
+        // Act as off-chain oracle providing response
+        vm.startPrank(offchainOracle, offchainOracle);
+        // Simulate oracle calling back into vision contract
+        oracleMock.addOpenAiResponse(0, 0, response, "");
     }
 }
