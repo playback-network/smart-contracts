@@ -14,7 +14,7 @@ contract FeedbackToken is ERC20, Ownable, ERC20Permit {
         _;
     }
 
-    constructor(address _manager) ERC20("FeedbackToken", "FBT") Ownable(msg.sender) ERC20Permit("FeedbackToken") {
+    constructor(address _manager) ERC20("PlaybackToken", "PBT") Ownable(msg.sender) ERC20Permit("FeedbackToken") {
         manager = _manager;
     }
 
