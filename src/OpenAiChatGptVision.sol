@@ -3,11 +3,6 @@ pragma solidity ^0.8.23;
 
 import "./interfaces/IOracle.sol";
 
-// TODO:
-// What do we set the system message to?
-// System message: Sets the LLMs behaviour at the start of the convo
-// https://platform.openai.com/docs/guides/text-generation/chat-completions-api
-
 contract OpenAiChatGptVision {
     struct ChatRun {
         address owner;
