@@ -35,11 +35,13 @@ contract OpenAiChatGptVision {
     address public oracleManager;
 
     event OracleAddressUpdated(address indexed newOracleAddress);
+    event OracleManagerUpdated(address indexed newOracleManager);
 
     IOracle.OpenAiRequest private config;
 
-    constructor(address initialOracleAddress) {
+    constructor(address initialOracleAddress, address manager) {
         owner = msg.sender;
+        oracleManager = manager;
         oracleAddress = initialOracleAddress;
         chatRunsCount = 0;
 
@@ -78,6 +80,11 @@ contract OpenAiChatGptVision {
     function setOracleAddress(address newOracleAddress) public onlyOwner {
         oracleAddress = newOracleAddress;
         emit OracleAddressUpdated(newOracleAddress);
+    }
+
+    function setOracleManager(address newOracleManager) public onlyOwner {
+        oracleManager = newOracleManager;
+        emit OracleManagerUpdated(newOracleManager);
     }
 
     function copyContentArray(IOracle.Content[] memory source) internal pure returns (IOracle.Content[] memory) {
