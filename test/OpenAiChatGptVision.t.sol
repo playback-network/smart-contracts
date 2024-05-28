@@ -16,9 +16,14 @@ contract OpenAiChatGptVisionTest is Test {
     address public deployer;
     address public testUser;
     address public manager;
-    address public offchainOracle;
     OpenAiChatGptVision public openAiChatGptVision;
+    // Oracle mock located in this repo
     ChatOracleMock public oracleMock;
+    // Used with oracle mock to simulate returning the response
+    address public offchainOracle;
+
+    // Actual oracle contract deployed on Galadriel Network
+    IOracle galOracle;
 
     // Used to create addresses
     uint256 _addressSeed = 123456789;
@@ -36,7 +41,7 @@ contract OpenAiChatGptVisionTest is Test {
     function setUp() public {
         // NOTE: You must update the fork value to the correct fork number after each deployment
         // TODO: Set blocknumber
-        fork = vm.createFork(vm.envString("GALADRIEL_DEVNET_RPC"), 5524873);
+        fork = vm.createFork(vm.envString("GALADRIEL_DEVNET_RPC"), 14004168);
         vm.selectFork(fork);
 
         testUser = makeAddress("TestUser");
@@ -62,12 +67,39 @@ contract OpenAiChatGptVisionTest is Test {
         // NOTE: Update oracle whitelist so off-chain oracle can call
         oracleMock.updateWhitelist(address(offchainOracle), true);
 
-        // NOTE: Update oracle whitelist, setting it to vision contract
+        // NOTE: Update oracle whitelist, so off-chain vision contract can call
         oracleMock.updateWhitelist(address(openAiChatGptVision), true);
         vm.stopPrank();
     }
 
-    function test_callOracleContract() external {
+    // BASIC TEST
+    // function test_callMockOracleContract() external {
+    //     vm.startPrank(manager, manager);
+    //     string[] memory images = new string[](3);
+    //     images[0] = "i1";
+    //     images[1] = "i2";
+    //     images[2] = "i3";
+    //     openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
+
+    //     vm.stopPrank();
+    //     // Get success response from oracleMock
+    //     IOracle.OpenAiResponse memory response = oracleMock.getSuccessResponse();
+
+    //     // Act as off-chain oracle providing response
+    //     vm.startPrank(offchainOracle, offchainOracle);
+    //     // Simulate oracle calling back into vision contract
+    //     oracleMock.addOpenAiResponse(0, 0, response, "");
+    // }
+
+    function test_callGaladrielOracleContract() external {
+        // Set galadriel oracle
+        galOracle = IOracle(vm.envAddress("GALADRIEL_ORACLE_ADDRESS"));
+
+        vm.startPrank(deployer, deployer);
+        // Update vision contract to point to galOracle
+        openAiChatGptVision.setOracleAddress(address(galOracle));
+        vm.stopPrank();
+
         vm.startPrank(manager, manager);
         string[] memory images = new string[](3);
         images[0] = "i1";
@@ -76,12 +108,5 @@ contract OpenAiChatGptVisionTest is Test {
         openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
 
         vm.stopPrank();
-        // Get success response from oracleMock
-        IOracle.OpenAiResponse memory response = oracleMock.getSuccessResponse();
-
-        // Act as off-chain oracle providing response
-        vm.startPrank(offchainOracle, offchainOracle);
-        // Simulate oracle calling back into vision contract
-        oracleMock.addOpenAiResponse(0, 0, response, "");
     }
 }
