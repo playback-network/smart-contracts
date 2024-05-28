@@ -4,11 +4,9 @@ pragma solidity ^0.8.23;
 import "../lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import "../lib/forge-std/src/interfaces/IERC20.sol";
 import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import "../lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
+import "../lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol" as HashUtils;
 
 contract SignedMinter is Ownable {
-    using MessageHashUtils for bytes32;
-
     IERC20 token;
     address payloadSigner;
     // TODO: Nonces
@@ -18,10 +16,6 @@ contract SignedMinter is Ownable {
     }
 
     function mint(bytes32 signature, uint256 tokenAmount, address recipient) public {
-        // Recover sig
-        bytes32 messageHash = getMessageHash(tokenAmount, recipient);
-        address signer = messageHash.toEthSignedMessageHash().recover(signature);
-
         // Ensure the signer is authorised
         require(signer == payloadSigner, "Invalid signature");
 
@@ -29,8 +23,11 @@ contract SignedMinter is Ownable {
         token.mint(recipient, tokenAmount);
     }
 
-    function getMessageHash(uint256 tokenAmount, address recipient) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(tokenAmount, recipient));
+    function _verify(bytes32 signature, uint256 tokenAmount, address recipient) internal pure returns (bool) {
+        bytes32 messageHash = keccak256(abi.encodePacked(tokenAmount, recipient));
+        bytes32 signedMessageHash = HashUtils.toEthSignedMessageHash(messageHash);
+        (address recoveredAddress, ECDSA.RecoverError errorReason, bytes32 errorMessage) =
+            ECDSA.tryRecover(signedMessageHash, signature);
     }
 
     function verify(bytes32 messageHash, bytes32 signature) internal pure returns (address) {}
