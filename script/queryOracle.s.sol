@@ -5,7 +5,7 @@ import "../lib/forge-std/src/Script.sol";
 import "../lib/forge-std/src/console2.sol";
 import "../src/OpenAiChatGptVision.sol";
 
-// forge script script/queryOracle.s.sol:QueryOracle --rpc-url https://devnet.galadriel.com -vvvv --optimize --optimizer-runs 200 --via-ir --legacy
+// forge script script/queryOracle.s.sol:QueryOracle --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
 contract QueryOracle is Script {
     function run() external {
         // deploy vision contract
