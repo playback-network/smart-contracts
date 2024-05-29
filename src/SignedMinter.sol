@@ -8,13 +8,17 @@ import "../lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUt
 contract SignedMinter is Ownable {
     event SignatureVerified(address indexed recipient, bytes signature, uint256 tokenAmount, address payloadSigner);
 
-    PlaybackToken token;
+    PlayBackToken token;
     address payloadSigner;
     // TODO: Nonces
 
     constructor(address _tokenAddress, address _payloadSigner) Ownable(msg.sender) {
-        token = PlaybackToken(_tokenAddress);
+        token = PlayBackToken(_tokenAddress);
         payloadSigner = _payloadSigner;
+    }
+
+    function setTokenAddress(address addr) external onlyOwner {
+        token = PlayBackToken(addr);
     }
 
     function mint(bytes memory signature, uint256 tokenAmount, address recipient) public {
