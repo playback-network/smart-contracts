@@ -73,23 +73,23 @@ contract OpenAiChatGptVisionTest is Test {
     }
 
     // BASIC TEST
-    // function test_callMockOracleContract() external {
-    //     vm.startPrank(manager, manager);
-    //     string[] memory images = new string[](3);
-    //     images[0] = "i1";
-    //     images[1] = "i2";
-    //     images[2] = "i3";
-    //     openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
+    function test_callMockOracleContract() external {
+        vm.startPrank(manager, manager);
+        string[] memory images = new string[](3);
+        images[0] = "i1";
+        images[1] = "i2";
+        images[2] = "i3";
+        openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
 
-    //     vm.stopPrank();
-    //     // Get success response from oracleMock
-    //     IOracle.OpenAiResponse memory response = oracleMock.getSuccessResponse();
+        vm.stopPrank();
+        // Get success response from oracleMock
+        IOracle.OpenAiResponse memory response = oracleMock.getSuccessResponse();
 
-    //     // Act as off-chain oracle providing response
-    //     vm.startPrank(offchainOracle, offchainOracle);
-    //     // Simulate oracle calling back into vision contract
-    //     oracleMock.addOpenAiResponse(0, 0, response, "");
-    // }
+        // Act as off-chain oracle providing response
+        vm.startPrank(offchainOracle, offchainOracle);
+        // Simulate oracle calling back into vision contract
+        oracleMock.addOpenAiResponse(0, 0, response, "");
+    }
 
     function test_callGaladrielOracleContract() external {
         // Set galadriel oracle
