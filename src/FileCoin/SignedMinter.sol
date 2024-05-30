@@ -1,9 +1,9 @@
 // pragma solidity ^0.8.23;
 
-import "../lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 import "./PlayBackToken.sol";
-import "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import "../lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
+import "../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract SignedMinter is Ownable {
     event SignatureVerified(address indexed recipient, bytes signature, uint256 tokenAmount, address payloadSigner);

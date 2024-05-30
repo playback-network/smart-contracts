@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.23;
 
-import "./interfaces/IOracle.sol";
+import "./../interfaces/IOracle.sol";
 
 contract OpenAiChatGptVision {
     struct ChatRun {

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import "../lib/forge-std/src/Script.sol";
-import "../lib/forge-std/src/console2.sol";
-import "../src/Gal.sol";
+import "../../lib/forge-std/src/Script.sol";
+import "../../lib/forge-std/src/console2.sol";
+import "../../src/Galadriel/Gal.sol";
 
 // forge script script/queryGal.s.sol:QueryOracle --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
 contract QueryOracle is Script {

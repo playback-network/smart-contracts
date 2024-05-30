@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.17;
 
-import "../lib/forge-std/src/Script.sol";
-import "../lib/forge-std/src/console2.sol";
-import "../src/SignedMinter.sol";
+import "../../lib/forge-std/src/Script.sol";
+import "../../lib/forge-std/src/console2.sol";
+import "../../src/FileCoin/SignedMinter.sol";
 
 contract VerifySignature is Script {
     function run() external {

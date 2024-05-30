@@ -4,8 +4,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.23;
 
-import "./interfaces/IOracle.sol";
-import "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
+import "./../interfaces/IOracle.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract OpenAiChatGptVision {
     using Strings for uint256;
