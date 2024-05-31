@@ -3,9 +3,9 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "forge-std/StdJson.sol";
-import "../lib/forge-std/src/console2.sol";
-import "../src/SignedMinter.sol";
-import "../src/PlayBackToken.sol";
+import "../../lib/forge-std/src/console2.sol";
+import "../../src/FileCoin/SignedMinter.sol";
+import "../../src/FileCoin/PlayBackToken.sol";
 
 contract OpenAiChatGptVisionTest is Test {
     using stdJson for string;

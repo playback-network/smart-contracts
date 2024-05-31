@@ -3,12 +3,12 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "forge-std/StdJson.sol";
-import "../lib/forge-std/src/console2.sol";
-import "../src/OpenAiChatGptVision_responseHC.sol";
+import "../../lib/forge-std/src/console2.sol";
+import "../../src/Galadriel/OpenAiChatGptVision_responseHC.sol";
 
-import "../src/interfaces/IChatGpt.sol";
-import "../src/interfaces/IOracle.sol";
-import "./mocks/ChatOracleMock.sol";
+import "../../src/interfaces/IChatGpt.sol";
+import "../../src/interfaces/IOracle.sol";
+import "./../mocks/ChatOracleMock.sol";
 
 // forge test -vvvvv --match-path '*/OpenAiChatGptVision_responseHC.t.sol' --via-ir
 contract OpenAiChatGptVisionTest is Test {

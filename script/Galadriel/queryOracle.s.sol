@@ -5,7 +5,7 @@ import "../../lib/forge-std/src/Script.sol";
 import "../../lib/forge-std/src/console2.sol";
 import "../../src/Galadriel/OpenAiChatGptVision.sol";
 
-// forge script script/queryOracle.s.sol:QueryOracle --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
+// forge script script/Galadriel/queryOracle.s.sol:QueryOracle --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
 contract QueryOracle is Script {
     function run() external {
         // deploy vision contract
@@ -14,9 +14,6 @@ contract QueryOracle is Script {
         // Get the privKey from the env var testnet values
         address deployer = vm.envAddress("PK1_ADDRESS");
         uint256 deployerPrivKey = vm.envUint("PK1");
-
-        // Get the Galadriel oracle contract address
-        address oracleAddress = vm.envAddress("GALADRIEL_ORACLE_ADDRESS");
 
         // Get the vision address
         address visionAddress = vm.envAddress("VISION_ADDRESS");
@@ -34,7 +31,7 @@ contract QueryOracle is Script {
         images[2] = "https://evm-poc-images.s3.eu-central-1.amazonaws.com/royal-tang/3.png";
 
         openAiChatGptVision.startChat(
-            deployer, "You help users identify animals in images", "what animal is in these images", images
+            deployer, "You help users identify animals in images", "are these fish", images
         );
 
         vm.stopBroadcast();
