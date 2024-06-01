@@ -6,9 +6,7 @@ import "../../lib/forge-std/src/console2.sol";
 import "../../src/FileCoin/SignedMinter.sol";
 import "../../src/FileCoin/PlayBackToken.sol";
 
-// forge script script/FileCoin/deploySignedMinterAndPlayBackToken.s.sol:DeployScript --rpc-url https://api.calibration.node.glif.io/rpc/v1 -vvvv --optimize --optimizer-runs 200
-
-// forge script script/FileCoin/deploy.s.sol:DeployScript --rpc-url https://api.calibration.node.glif.io/rpc/v1 -vvvv --optimize --optimizer-runs 200 --broadcast --via-ir
+// forge script script/FileCoin/deploySignedMinterAndPlayBackToken.s.sol:DeployScript --rpc-url https://api.calibration.node.glif.io/rpc/v1 -vvvv --optimize --optimizer-runs 200 --via-ir -g 100000
 contract DeployScript is Script {
     function run() external {
         // deploy vision contract
@@ -24,18 +22,20 @@ contract DeployScript is Script {
         vm.startBroadcast(deployerPrivKey);
 
         // // Deploy the contract and set deployer token address temporarily
-        SignedMinter signedMinter = new SignedMinter(deployer, payloadSigner);
-        // Output the contract address for ease of access!
-        console2.log("signedMinter contract address", address(signedMinter));
-
-        // // Deploy PlayBackToken
-        // PlayBackToken playBackToken = new PlayBackToken(address(signedMinter));
+        // SignedMinter signedMinter = new SignedMinter(deployer, payloadSigner);
         // // Output the contract address for ease of access!
-        // console2.log("playBackToken contract address", address(playBackToken));
+        // console2.log("signedMinter contract address", address(signedMinter));
 
-        // // Set the token address in the signedMinter contract
-        // signedMinter.setTokenAddress(address(playBackToken));
-        // console2.log("deployerAddress", deployer);
+        SignedMinter sM = SignedMinter(0xF00DF8031E2e20F5334A3a4A0FbAaD156B6E58c7);
+
+        // Deploy PlayBackToken
+        PlayBackToken playBackToken = new PlayBackToken(address(sM));
+        // Output the contract address for ease of access!
+        console2.log("playBackToken contract address", address(playBackToken));
+
+        // Set the token address in the signedMinter contract
+        sM.setTokenAddress(address(playBackToken));
+        console2.log("deployerAddress", deployer);
 
         vm.stopBroadcast();
     }

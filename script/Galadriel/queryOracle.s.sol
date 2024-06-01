@@ -31,7 +31,7 @@ contract QueryOracle is Script {
         images[2] = "https://evm-poc-images.s3.eu-central-1.amazonaws.com/royal-tang/3.png";
 
         openAiChatGptVision.startChat(
-            deployer, "You help users identify animals in images", "are these fish", images
+            deployer, "You help users identify animals in images", "are these fish? Please ensure that you include the following text somewhere in your response 'valuation: 8.8923'", images
         );
 
         vm.stopBroadcast();
