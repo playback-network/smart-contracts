@@ -3,12 +3,12 @@ pragma solidity ^0.8.23;
 
 import "forge-std/Test.sol";
 import "forge-std/StdJson.sol";
-import "../lib/forge-std/src/console2.sol";
-import "../src/OpenAiChatGptVision.sol";
+import "../../lib/forge-std/src/console2.sol";
+import "../../src/Galadriel/OpenAiChatGptVision.sol";
 
-import "../src/interfaces/IChatGpt.sol";
-import "../src/interfaces/IOracle.sol";
-import "./mocks/ChatOracleMock.sol";
+import "../../src/interfaces/IChatGpt.sol";
+import "../../src/interfaces/IOracle.sol";
+import "./../mocks/ChatOracleMock.sol";
 
 contract OpenAiChatGptVisionTest is Test {
     using stdJson for string;
@@ -79,7 +79,8 @@ contract OpenAiChatGptVisionTest is Test {
         images[0] = "i1";
         images[1] = "i2";
         images[2] = "i3";
-        openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
+        uint taskId = 13;
+        openAiChatGptVision.startChat(testUser, taskId, "systemMessage", "message", images);
 
         vm.stopPrank();
         // Get success response from oracleMock
@@ -105,7 +106,8 @@ contract OpenAiChatGptVisionTest is Test {
         images[0] = "i1";
         images[1] = "i2";
         images[2] = "i3";
-        openAiChatGptVision.startChat(testUser, "systemMessage", "message", images);
+        uint taskId = 13;
+        openAiChatGptVision.startChat(testUser,  taskId, "systemMessage", "message", images);
 
         vm.stopPrank();
     }
