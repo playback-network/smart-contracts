@@ -8,6 +8,8 @@ contract OpenAiChatGptVision {
         address owner;
         IOracle.Message[] messages;
         uint256 messagesCount;
+        uint taskId;
+        string[] imageUrls;
     }
 
     struct Response {
@@ -23,7 +25,7 @@ contract OpenAiChatGptVision {
 
     mapping(uint256 => Response) public responses;
 
-    event ResponseReceived(address owner, uint256 indexed chatId, bool indexed success, string response);
+    event ResponseReceived(address owner, uint256 indexed taskId, bool indexed success, string response, string[] imageUrls);
 
     address private owner;
     address public oracleAddress;
@@ -91,13 +93,15 @@ contract OpenAiChatGptVision {
         return result;
     }
 
-    function startChat(address chatOwner, string memory systemMessage, string memory message, string[] memory imageUrls)
+    function startChat(address chatOwner, uint taskId, string memory systemMessage, string memory message, string[] memory imageUrls)
         public
         onlyManager
         returns (uint256)
     {
         ChatRun storage run = chatRuns[chatRunsCount];
         run.owner = chatOwner;
+        run.taskId = taskId;
+        run.imageUrls = imageUrls;
 
         // Set system message
         IOracle.Message memory sysMessage = IOracle.Message({role: "system", content: new IOracle.Content[](1)});
@@ -130,6 +134,10 @@ contract OpenAiChatGptVision {
         string memory errorMessage
     ) public onlyOracle {
         ChatRun storage run = chatRuns[runId];
+
+        uint taskId = run.taskId;
+        string[] memory imageUrls = run.imageUrls;
+
         require(
             keccak256(abi.encodePacked(run.messages[run.messagesCount - 1].role)) == keccak256(abi.encodePacked("user")),
             "No message to respond to"
@@ -144,7 +152,7 @@ contract OpenAiChatGptVision {
             run.messagesCount++;
 
             responses[runId] = Response({owner: chatOwner, success: false, response: errorMessage});
-            emit ResponseReceived(chatOwner, runId, false, errorMessage);
+            emit ResponseReceived(chatOwner, taskId, false, errorMessage, imageUrls);
         } else {
             IOracle.Message memory newMessage = IOracle.Message({role: "assistant", content: new IOracle.Content[](1)});
             newMessage.content[0].contentType = "text";
@@ -153,7 +161,7 @@ contract OpenAiChatGptVision {
             run.messagesCount++;
 
             responses[runId] = Response({owner: chatOwner, success: true, response: response.content});
-            emit ResponseReceived(chatOwner, runId, true, response.content);
+            emit ResponseReceived(chatOwner, taskId, true, response.content, imageUrls);
         }
     }
 
