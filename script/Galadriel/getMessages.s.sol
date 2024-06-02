@@ -5,18 +5,17 @@ import "../../lib/forge-std/src/Script.sol";
 import "../../lib/forge-std/src/console2.sol";
 import "../../src/Galadriel/Gal.sol";
 
-// forge script script/getMessages.s.sol:GetMessages --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
+// forge script script/Galadriel/getMessages.s.sol:GetMessages --rpc-url https://devnet.galadriel.com -vvvv --via-ir --legacy
 contract GetMessages is Script {
     function run() external {
         // deploy vision contract
         // update oracle contract whitelist so vision contract can call it
 
         // Get the privKey from the env var testnet values
-        address deployer = vm.envAddress("PK1_ADDRESS");
         uint256 deployerPrivKey = vm.envUint("PK1");
 
         // Get the vision address
-        address visionAddress = vm.envAddress("VISION_ADDRESS");
+        address visionAddress = vm.envAddress("VISION_ADDRESS_V2");
 
         // // Tell F to send txs to the BC
         vm.startBroadcast(deployerPrivKey);
@@ -25,7 +24,7 @@ contract GetMessages is Script {
         OpenAiChatGptVision openAiChatGptVision = OpenAiChatGptVision(visionAddress);
 
         // Messages up to 4!
-        openAiChatGptVision.getMessageHistory(5);
+        openAiChatGptVision.getMessageHistory(0);
 
         vm.stopBroadcast();
     }
