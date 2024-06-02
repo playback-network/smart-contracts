@@ -5,7 +5,7 @@ import "../../lib/forge-std/src/Script.sol";
 import "../../lib/forge-std/src/console2.sol";
 import "../../src/Galadriel/OpenAiChatGptVision.sol";
 
-// forge script script/depoyVision.s.sol:DeployScript --rpc-url https://devnet.galadriel.com -vvvv --optimize --optimizer-runs 200 --via-ir --legacy
+// forge script script/Galadriel/depoyVision.s.sol:DeployScript --rpc-url https://devnet.galadriel.com -vvvv --optimize --optimizer-runs 200 --via-ir --legacy
 contract DeployScript is Script {
     function run() external {
         // deploy vision contract
