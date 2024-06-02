@@ -1,6 +1,12 @@
+2024_06_01 Galadriel testnet, includes image urls in RepsonseReceived event so EC2 instance can access them
+OpenAiChatGptVision: 0x8c678839dE8fb74D9c66b10DF20FEAe79b2848d9
+
+
+--OLD---
 2024_05_28 Galadriel testnet
 OpenAiChatGptVision: 0x815482f3CdD716F6dBefa7FF7E5050a79e841dE9
 
+-- OLD --
 2024_05_30
 Gal: 0xF00DF8031E2e20F5334A3a4A0FbAaD156B6E58c7
 
